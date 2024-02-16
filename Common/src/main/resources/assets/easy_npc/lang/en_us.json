@@ -132,6 +132,7 @@
   "text.easy_npc.config.no_answer": "No - Answer",
   "text.easy_npc.config.no_presets_found": "No presets found!",
   "text.easy_npc.config.objective": "Objectives",
+  "text.easy_npc.config.grab_model": "Update",
   "text.easy_npc.config.on_button_click": "On Button Click",
   "text.easy_npc.config.on_close_dialog": "On Close Dialog",
   "text.easy_npc.config.on_death": "On Dead",

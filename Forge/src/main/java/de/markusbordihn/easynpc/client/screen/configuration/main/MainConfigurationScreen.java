@@ -72,6 +72,8 @@ public class MainConfigurationScreen extends ConfigurationScreen<MainConfigurati
   protected Button removeEntityButton;
   protected Button saveNameButton;
   protected Button respawnButton;
+  protected Button grabModelButton;
+  private EditBox modelPathBox;
   private EditBox nameBox;
 
   // Cache
@@ -444,7 +446,7 @@ public class MainConfigurationScreen extends ConfigurationScreen<MainConfigurati
             new TextButton(
                 buttonLeftPosition,
                 buttonTopPosition,
-                BUTTON_WIDTH,
+                59,
                 "attributes",
                 onPress ->
                     NetworkMessageHandler.openConfiguration(
@@ -456,11 +458,31 @@ public class MainConfigurationScreen extends ConfigurationScreen<MainConfigurati
             new TextButton(
                 this.editAttributes.x + this.editAttributes.getWidth() + buttonSpace,
                 buttonTopPosition,
-                BUTTON_WIDTH,
+                59,
                 "objective",
                 onPress ->
                     NetworkMessageHandler.openConfiguration(
                         uuid, ConfigurationType.BASIC_OBJECTIVE)));
+
+    // Grab Model Button
+    this.grabModelButton =
+            this.addRenderableWidget(
+                    new TextButton(
+                            this.editObjectiveButton.x + this.editObjectiveButton.getWidth() + buttonSpace,
+                            buttonTopPosition,
+                            59,
+                            "grab_model",
+                            onPress ->
+                                    NetworkMessageHandler.openConfiguration(
+                                            uuid, ConfigurationType.BASIC_OBJECTIVE)));
+
+    buttonTopPosition = buttonTopPosition + BUTTON_HEIGHT + buttonSpace;
+
+    this.modelPathBox = new TextField(this.font, buttonLeftPosition, buttonTopPosition, 184);
+    this.modelPathBox.setMaxLength(216);
+    this.modelPathBox.setValue("Path..");
+    this.modelPathBox.setResponder(consumer -> this.validateName());
+    this.addRenderableWidget(this.modelPathBox);
 
     // Copy UUID Button
     this.copyUUIDButton =
