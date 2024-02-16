@@ -105,7 +105,11 @@ public class EasyNPCEntity extends EasyNPCEntityData implements EasyNPCEntityAct
   }
 
   public void openMainConfigurationMenu(ServerPlayer serverPlayer) {
-    EasyNPCEntityMenu.openMainConfigurationMenu(serverPlayer, this);
+    if (this.supportsConfiguration()) {
+      EasyNPCEntityMenu.openMainConfigurationMenu(serverPlayer, this);
+    } else {
+      log.warn("Configuration for {} is disabled!", this);
+    }
   }
 
   public void npcBaseTick() {
@@ -237,19 +241,23 @@ public class EasyNPCEntity extends EasyNPCEntityData implements EasyNPCEntityAct
     this.onEasyNPCLeaveUpdateObjective(easyNPCEntity);
   }
 
-  public void onPlayerJoin(ServerPlayer serverPlayer) {
+  @Override
+  public void handlePlayerJoin(ServerPlayer serverPlayer) {
     this.onPlayerJoinUpdateObjective(serverPlayer);
   }
 
-  public void onPlayerLeave(ServerPlayer serverPlayer) {
+  @Override
+  public void handlePlayerLeave(ServerPlayer serverPlayer) {
     this.onPlayerLeaveUpdateObjective(serverPlayer);
   }
 
-  public void onLivingEntityJoin(LivingEntity livingEntity) {
+  @Override
+  public void handleLivingEntityJoin(LivingEntity livingEntity) {
     this.onLivingEntityJoinUpdateObjective(livingEntity);
   }
 
-  public void onLivingEntityLeave(LivingEntity livingEntity) {
+  @Override
+  public void handleLivingEntityLeave(LivingEntity livingEntity) {
     this.onLivingEntityLeaveUpdateObjective(livingEntity);
   }
 

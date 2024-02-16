@@ -19,13 +19,7 @@
 
 package de.markusbordihn.easynpc.data.entity;
 
-import de.markusbordihn.easynpc.data.action.ActionEventSet;
-import de.markusbordihn.easynpc.data.dialog.DialogDataSet;
-import de.markusbordihn.easynpc.data.model.ModelPose;
 import de.markusbordihn.easynpc.data.objective.ObjectiveDataSet;
-import de.markusbordihn.easynpc.data.position.CustomPosition;
-import de.markusbordihn.easynpc.data.scale.CustomScale;
-import de.markusbordihn.easynpc.data.skin.SkinType;
 import de.markusbordihn.easynpc.data.trading.TradingType;
 import de.markusbordihn.easynpc.entity.Profession;
 import java.util.HashSet;
@@ -37,34 +31,6 @@ import net.minecraft.world.item.trading.MerchantOffers;
 
 public class CustomDataSerializers {
 
-  public static final EntityDataSerializer<ActionEventSet> ACTION_EVENT_SET =
-      new EntityDataSerializer<>() {
-        public void write(FriendlyByteBuf buffer, ActionEventSet value) {
-          buffer.writeNbt(value.createTag());
-        }
-
-        public ActionEventSet read(FriendlyByteBuf buffer) {
-          return new ActionEventSet(buffer.readNbt());
-        }
-
-        public ActionEventSet copy(ActionEventSet value) {
-          return value;
-        }
-      };
-  public static final EntityDataSerializer<DialogDataSet> DIALOG_DATA_SET =
-      new EntityDataSerializer<>() {
-        public void write(FriendlyByteBuf buffer, DialogDataSet value) {
-          buffer.writeNbt(value.createTag());
-        }
-
-        public DialogDataSet read(FriendlyByteBuf buffer) {
-          return new DialogDataSet(buffer.readNbt());
-        }
-
-        public DialogDataSet copy(DialogDataSet value) {
-          return value;
-        }
-      };
   public static final EntityDataSerializer<ObjectiveDataSet> OBJECTIVE_DATA_SET =
       new EntityDataSerializer<>() {
         public void write(FriendlyByteBuf buffer, ObjectiveDataSet value) {
@@ -93,20 +59,6 @@ public class CustomDataSerializers {
           return value;
         }
       };
-  public static final EntityDataSerializer<ModelPose> MODEL_POSE =
-      new EntityDataSerializer<>() {
-        public void write(FriendlyByteBuf buffer, ModelPose value) {
-          buffer.writeEnum(value);
-        }
-
-        public ModelPose read(FriendlyByteBuf buffer) {
-          return buffer.readEnum(ModelPose.class);
-        }
-
-        public ModelPose copy(ModelPose value) {
-          return value;
-        }
-      };
   public static final EntityDataSerializer<MerchantOffers> MERCHANT_OFFERS =
       new EntityDataSerializer<>() {
         public void write(FriendlyByteBuf buffer, MerchantOffers value) {
@@ -121,38 +73,6 @@ public class CustomDataSerializers {
           return value;
         }
       };
-  public static final EntityDataSerializer<CustomPosition> POSITION =
-      new EntityDataSerializer<>() {
-        public void write(FriendlyByteBuf buffer, CustomPosition position) {
-          buffer.writeFloat(position.x());
-          buffer.writeFloat(position.y());
-          buffer.writeFloat(position.z());
-        }
-
-        public CustomPosition read(FriendlyByteBuf buffer) {
-          return new CustomPosition(buffer.readFloat(), buffer.readFloat(), buffer.readFloat());
-        }
-
-        public CustomPosition copy(CustomPosition position) {
-          return position;
-        }
-      };
-  public static final EntityDataSerializer<CustomScale> SCALE =
-      new EntityDataSerializer<>() {
-        public void write(FriendlyByteBuf buffer, CustomScale scale) {
-          buffer.writeFloat(scale.x());
-          buffer.writeFloat(scale.y());
-          buffer.writeFloat(scale.z());
-        }
-
-        public CustomScale read(FriendlyByteBuf buffer) {
-          return new CustomScale(buffer.readFloat(), buffer.readFloat(), buffer.readFloat());
-        }
-
-        public CustomScale copy(CustomScale scale) {
-          return scale;
-        }
-      };
   public static final EntityDataSerializer<Profession> PROFESSION =
       new EntityDataSerializer<>() {
         public void write(FriendlyByteBuf buffer, Profession value) {
@@ -164,20 +84,6 @@ public class CustomDataSerializers {
         }
 
         public Profession copy(Profession value) {
-          return value;
-        }
-      };
-  public static final EntityDataSerializer<SkinType> SKIN_TYPE =
-      new EntityDataSerializer<>() {
-        public void write(FriendlyByteBuf buffer, SkinType value) {
-          buffer.writeEnum(value);
-        }
-
-        public SkinType read(FriendlyByteBuf buffer) {
-          return buffer.readEnum(SkinType.class);
-        }
-
-        public SkinType copy(SkinType value) {
           return value;
         }
       };
@@ -223,15 +129,9 @@ public class CustomDataSerializers {
       };
 
   static {
-    EntityDataSerializers.registerSerializer(ACTION_EVENT_SET);
-    EntityDataSerializers.registerSerializer(DIALOG_DATA_SET);
     EntityDataSerializers.registerSerializer(MERCHANT_OFFERS);
-    EntityDataSerializers.registerSerializer(MODEL_POSE);
     EntityDataSerializers.registerSerializer(OBJECTIVE_DATA_SET);
-    EntityDataSerializers.registerSerializer(POSITION);
-    EntityDataSerializers.registerSerializer(SCALE);
     EntityDataSerializers.registerSerializer(PROFESSION);
-    EntityDataSerializers.registerSerializer(SKIN_TYPE);
     EntityDataSerializers.registerSerializer(STRING_HASH_SET);
     EntityDataSerializers.registerSerializer(TRADING_TYPE);
     EntityDataSerializers.registerSerializer(UUID_HASH_SET);

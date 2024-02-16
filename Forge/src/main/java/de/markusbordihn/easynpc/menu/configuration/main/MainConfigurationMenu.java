@@ -19,10 +19,11 @@
 
 package de.markusbordihn.easynpc.menu.configuration.main;
 
+import de.markusbordihn.easynpc.data.dialog.DialogType;
 import de.markusbordihn.easynpc.menu.ModMenuTypes;
 import de.markusbordihn.easynpc.menu.configuration.ConfigurationMenu;
 import java.util.UUID;
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
@@ -34,27 +35,36 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 
 public class MainConfigurationMenu extends ConfigurationMenu {
 
-  public MainConfigurationMenu(int windowId, Inventory playerInventory, UUID uuid) {
+  protected final DialogType dialogType;
+
+  public MainConfigurationMenu(
+      int windowId, Inventory playerInventory, UUID uuid, DialogType dialogType) {
     super(ModMenuTypes.MAIN_CONFIGURATION_MENU.get(), windowId, playerInventory, uuid);
+    this.dialogType = dialogType;
   }
 
   public MainConfigurationMenu(int windowId, Inventory playerInventory, FriendlyByteBuf data) {
-    this(windowId, playerInventory, data.readUUID());
+    this(windowId, playerInventory, data.readUUID(), data.readEnum(DialogType.class));
   }
 
-  public static MenuProvider getMenuProvider(UUID uuid, Entity entity) {
+  public static MenuProvider getMenuProvider(UUID uuid, Entity entity, DialogType dialogType) {
     return new MenuProvider() {
+      @Nonnull
       @Override
       public Component getDisplayName() {
         return new TextComponent("Main Configuration for " + entity.getName().getString());
       }
 
-      @Nullable
+      @Nonnull
       @Override
       public AbstractContainerMenu createMenu(
-          int windowId, Inventory inventory, Player serverPlayer) {
-        return new MainConfigurationMenu(windowId, inventory, uuid);
+          int windowId, @Nonnull Inventory inventory, @Nonnull Player serverPlayer) {
+        return new MainConfigurationMenu(windowId, inventory, uuid, dialogType);
       }
     };
+  }
+
+  public DialogType getDialogType() {
+    return this.dialogType;
   }
 }

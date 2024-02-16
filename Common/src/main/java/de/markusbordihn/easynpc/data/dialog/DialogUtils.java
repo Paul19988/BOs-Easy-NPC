@@ -37,9 +37,12 @@ public class DialogUtils {
   private static final String MACRO_HTML_LINE_BREAK = "<br>";
   private static final String MACRO_LINE_BREAK = "\\n";
   private static final int MAX_DIALOG_LINE_LENGTH = 178;
+  private static final int MAX_SMALL_BUTTON_NAME_LENGTH = 20;
+
+  protected DialogUtils() {}
 
   public static String parseDialogText(String text, LivingEntity entity, Player player) {
-    if (!hasDialogMacros(text)) {
+    if (!hasDialogMacros(text) && !hasDialogLineBreaksMacros(text)) {
       return text;
     }
 
@@ -54,19 +57,28 @@ public class DialogUtils {
     }
 
     // Replace all line breaks macros.
-    text = text.replace(MACRO_LINE_BREAK, "\n");
-    text = text.replace(MACRO_HTML_LINE_BREAK, "\n");
+    text = parseLineBreaks(text);
 
     return text;
+  }
+
+  public static String parseLineBreaks(String text) {
+    if (text == null || text.isEmpty()) {
+      return text;
+    }
+    return text.replace(MACRO_LINE_BREAK, "\n").replace(MACRO_HTML_LINE_BREAK, "\n");
   }
 
   public static boolean hasDialogMacros(String text) {
     return text != null
         && !text.isEmpty()
-        && (text.contains(MACRO_NPC_STRING)
-            || text.contains(MACRO_INITIATOR_STRING)
-            || text.contains(MACRO_LINE_BREAK)
-            || text.contains(MACRO_HTML_LINE_BREAK));
+        && (text.contains(MACRO_NPC_STRING) || text.contains(MACRO_INITIATOR_STRING));
+  }
+
+  public static boolean hasDialogLineBreaksMacros(String text) {
+    return text != null
+        && !text.isEmpty()
+        && (text.contains(MACRO_LINE_BREAK) || text.contains(MACRO_HTML_LINE_BREAK));
   }
 
   public static String generateButtonLabel(String name) {
@@ -74,7 +86,7 @@ public class DialogUtils {
   }
 
   public static String generateDialogLabel(String name) {
-    return generateLabel(name, "dialog", DialogData.MAX_DIALOG_LABEL_LENGTH);
+    return generateLabel(name, "dialog", DialogDataEntry.MAX_DIALOG_LABEL_LENGTH);
   }
 
   private static String generateLabel(String name, String type, int maxLength) {
@@ -104,7 +116,7 @@ public class DialogUtils {
 
   public static DialogDataSet getBasicDialog(String dialog) {
     DialogDataSet dialogDataSet = new DialogDataSet(DialogType.BASIC);
-    DialogData dialogData = new DialogData("Basic Dialog", dialog, false);
+    DialogDataEntry dialogData = new DialogDataEntry("Basic Dialog", dialog, false);
     dialogDataSet.addDialog(dialogData);
     return dialogDataSet;
   }
@@ -135,13 +147,13 @@ public class DialogUtils {
     // Build dialog data set.
     DialogDataSet dialogDataSet = new DialogDataSet(DialogType.YES_NO);
     dialogDataSet.addDefaultDialog(
-        new DialogData("question", "Question Dialog", dialogText, false, buttons));
-    dialogDataSet.addDialog(new DialogData("yes_answer", "Yes Dialog", yesDialogText, false));
-    dialogDataSet.addDialog(new DialogData("no_answer", "No Dialog", noDialogText, false));
+        new DialogDataEntry("question", "Question Dialog", dialogText, false, buttons));
+    dialogDataSet.addDialog(new DialogDataEntry("yes_answer", "Yes Dialog", yesDialogText, false));
+    dialogDataSet.addDialog(new DialogDataEntry("no_answer", "No Dialog", noDialogText, false));
     return dialogDataSet;
   }
 
-  public static DialogScreenLayout getDialogScreenLayout(DialogData dialogData, Font font) {
+  public static DialogScreenLayout getDialogScreenLayout(DialogDataEntry dialogData, Font font) {
     if (dialogData == null) {
       return DialogScreenLayout.UNKNOWN;
     }
@@ -155,9 +167,28 @@ public class DialogUtils {
     // Check if we could use a compact layout or if we need to use a full layout.
     String dialogText = dialogData.getDialogText();
     boolean hasDialogMacros = hasDialogMacros(dialogText);
-    int numberOfLines =
-        getNumbersOfDialogLines(
-            hasDialogMacros ? dialogText + "PLACEHOLDER_FOR_POSSIBLE_MACROS" : dialogText, font);
+
+    // Check if we need to parse line breaks.
+    if (hasDialogLineBreaksMacros(dialogText)) {
+      dialogText = parseLineBreaks(dialogText);
+    } else if (hasDialogMacros) {
+      dialogText = dialogText + "PLACEHOLDER_FOR_POSSIBLE_MACROS";
+    }
+
+    // Calculate the number of lines.
+    int numberOfLines = getNumbersOfDialogLines(dialogText, font);
+
+    // Get the max length of the button names to check if we could use a compact layout.
+    int maxButtonNameLength = 0;
+    if (numberOfButtons > 0) {
+      for (DialogButtonData buttonData : dialogData.getButtons()) {
+        int buttonNameLength = buttonData.getName().length();
+        if (buttonNameLength > maxButtonNameLength) {
+          maxButtonNameLength = buttonNameLength;
+        }
+      }
+    }
+    boolean hasLargeButtonName = maxButtonNameLength > MAX_SMALL_BUTTON_NAME_LENGTH;
 
     // Everything with 6 or fewer lines could be displayed in a compact layout.
     if (numberOfLines <= 6) {
@@ -166,7 +197,9 @@ public class DialogUtils {
       } else if (numberOfButtons == 1) {
         return DialogScreenLayout.COMPACT_TEXT_WITH_ONE_BUTTON;
       } else if (numberOfButtons == 2) {
-        return DialogScreenLayout.COMPACT_TEXT_WITH_TWO_BUTTONS;
+        return hasLargeButtonName
+            ? DialogScreenLayout.COMPACT_TEXT_WITH_TWO_LARGE_BUTTONS
+            : DialogScreenLayout.COMPACT_TEXT_WITH_TWO_BUTTONS;
       } else if (numberOfButtons == 3) {
         return DialogScreenLayout.COMPACT_TEXT_WITH_THREE_BUTTONS;
       } else if (numberOfButtons == 4) {

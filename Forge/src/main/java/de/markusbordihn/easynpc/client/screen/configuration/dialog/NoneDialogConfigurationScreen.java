@@ -76,7 +76,7 @@ public class NoneDialogConfigurationScreen
                     DialogDataSet dialogDataSet = new DialogDataSet(DialogType.NONE);
                     NetworkMessageHandler.saveDialog(uuid, dialogDataSet);
                   } else {
-                    if (formerDialogDataSet != null) {
+                    if (this.formerDialogDataSet != null) {
                       NetworkMessageHandler.saveDialog(uuid, formerDialogDataSet);
                     } else {
                       DialogDataSet dialogDataSet = new DialogDataSet(DialogType.BASIC);
